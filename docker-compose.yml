@@ -1,0 +1,39 @@
+version: '3.8'
+
+x-python-containers: &python-containers
+  build: .
+  volumes:
+    - .:/app
+  env_file:
+    - .env.dev
+
+services:
+  web:
+    <<: *python-containers
+    command: gunicorn sibdev_test_2.wsgi --bind 0.0.0.0:8000
+    ports:
+      - 8000:8000
+    depends_on:
+      - db
+      - redis
+
+  db:
+    image: postgres:15
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    env_file:
+      - .env.dev
+
+  redis:
+    image: redis:7
+
+  autotests:
+    <<: *python-containers
+    command: bash -c "coverage run manage.py test && coverage report"
+    depends_on:
+      - db
+    environment:
+      TESTING: 1
+
+volumes:
+  postgres_data:
