@@ -1,7 +1,9 @@
 version: '3.8'
 
 x-python-containers: &python-containers
-  build: .
+  build:
+    context: .
+    dockerfile: ./deploy/Dockerfile
   volumes:
     - .:/app
   env_file:
@@ -10,9 +12,9 @@ x-python-containers: &python-containers
 services:
   web:
     <<: *python-containers
-    command: gunicorn sibdev_test_2.wsgi --bind 0.0.0.0:8000
+    command: /app/deploy/start-django-app.sh
     ports:
-      - 8000:8000
+      - "8000:8000"
     depends_on:
       - db
       - redis
@@ -26,6 +28,24 @@ services:
 
   redis:
     image: redis:7
+
+  celery-worker:
+    <<: *python-containers
+    command: /app/deploy/start-celery-worker.sh
+    depends_on:
+      - db
+      - redis
+    env_file:
+      - .env.dev
+
+  celery-beat:
+    <<: *python-containers
+    command: /app/deploy/start-celery-beat.sh
+    depends_on:
+      - db
+      - redis
+    env_file:
+      - .env.dev
 
   autotests:
     <<: *python-containers

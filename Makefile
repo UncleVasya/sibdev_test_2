@@ -2,7 +2,7 @@ build:
 	docker-compose build
 
 run:
-	docker-compose up web
+	docker-compose up web celery-worker celery-beat
 
 test:
 	docker-compose up autotests

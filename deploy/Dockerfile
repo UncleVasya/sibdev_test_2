@@ -12,12 +12,11 @@ ENV PYTHONUNBUFFERED 1
 RUN apt-get update && apt-get install --no-install-recommends -y \
   libpq-dev
 
-# установка зависимостей проекта
+## установка зависимостей проекта
 RUN pip install --upgrade pip
-
 RUN pip install poetry
-COPY ./pyproject.toml .
-COPY ./poetry.lock .
+COPY ./requirements/pyproject.toml .
+COPY ./requirements/poetry.lock .
 RUN poetry export --output requirements.txt
 
 RUN pip wheel --no-cache-dir --no-deps --wheel-dir /wheels -r requirements.txt
@@ -40,6 +39,6 @@ RUN pip install --no-cache /wheels/*
 # копируем код проекта
 COPY . .
 
-# запускаем entrypoint.sh
-RUN chmod +x ./entrypoint.sh
-ENTRYPOINT ["./entrypoint.sh"]
+RUN chmod +x ./deploy/*.sh
+
+ENTRYPOINT ["./deploy/entrypoint.sh"]
