@@ -1,5 +1,7 @@
 from django.db import models
 
+from app.users.models import User
+
 
 class Currency(models.Model):
     char_code = models.CharField(max_length=3, unique=True)
@@ -7,6 +9,9 @@ class Currency(models.Model):
 
     def __str__(self):
         return f'{self.char_code}: {self.name}'
+
+    class Meta:
+        ordering = ('char_code',)
 
 
 class CurrencyPrice(models.Model):
@@ -16,6 +21,7 @@ class CurrencyPrice(models.Model):
 
     class Meta:
         unique_together = ('date', 'currency')
+        ordering = ('-date', 'currency')
 
     def __str__(self):
         return (
@@ -24,3 +30,12 @@ class CurrencyPrice(models.Model):
             f'{self.value}'
         )
 
+
+class UserCurrency(models.Model):
+    """Модель для отслеживания пользователем стоимости валют."""
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    currency = models.ForeignKey(Currency, on_delete=models.CASCADE)
+    threshold = models.DecimalField(decimal_places=4, max_digits=10)
+
+    class Meta:
+        ordering = ('currency',)

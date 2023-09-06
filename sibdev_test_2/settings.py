@@ -1,3 +1,4 @@
+from datetime import timedelta
 from pathlib import Path
 
 import environ
@@ -105,6 +106,7 @@ CACHES = {
         'OPTIONS': {
             'CLIENT_CLASS': 'django_redis.client.DefaultClient'
         },
+        'TIMEOUT': 36000,
     }
 }
 
@@ -136,10 +138,15 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
+    'ORDERING_PARAM': 'order_by',
 }
 
+JWT_ACCESS_TOKEN_LIFETIME = env('JWT_ACCESS_TOKEN_LIFETIME', default=5)
+JWT_REFRESH_TOKEN_LIFETIME = env('JWT_REFRESH_TOKEN_LIFETIME', default=360)
 SIMPLE_JWT = {
    'AUTH_HEADER_TYPES': ('JWT',),
+   'ACCESS_TOKEN_LIFETIME': timedelta(minutes=JWT_ACCESS_TOKEN_LIFETIME),
+   'REFRESH_TOKEN_LIFETIME': timedelta(minutes=JWT_REFRESH_TOKEN_LIFETIME),
 }
 
 AUTH_USER_MODEL = 'users.User'
