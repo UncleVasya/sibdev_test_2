@@ -10,7 +10,12 @@ urlpatterns = [
         views.UserCurrencyCreateView.as_view(),
         name='user-currency'
     ),
-path(
+    path(
+        'currency/<int:id>/analytics/',
+        views.AnalyticsView.as_view(),
+        name='analytics'
+    ),
+    path(
         'rates/',
         views.RatesView.as_view(),
         name='rates'

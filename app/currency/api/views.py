@@ -1,6 +1,9 @@
 from django.contrib.auth.models import AbstractUser, AnonymousUser
 from django.core.cache import cache
-from django.db.models import QuerySet, Subquery
+from django.db.models import (
+    QuerySet, Subquery, Window, Max, F, Value, Case,
+    When, ExpressionWrapper, Q, Min, DecimalField
+)
 from django.http import HttpRequest
 from django.utils.decorators import method_decorator
 from rest_framework import generics
@@ -8,9 +11,10 @@ from rest_framework.filters import OrderingFilter
 from rest_framework.response import Response
 import typing as t
 from app.currency.api import serializers, const
-from app.currency.api.const import cache_timeout
+from app.currency.api.filters import DateRangeFilter
 from app.currency.models import UserCurrency, CurrencyPrice
 from app.tools.helpers import cache_per_user
+from django_filters.rest_framework import DjangoFilterBackend
 
 
 class UserCurrencyCreateView(generics.CreateAPIView):
@@ -21,7 +25,7 @@ class UserCurrencyCreateView(generics.CreateAPIView):
 
 class RatesView(generics.ListAPIView):
     """Представление для отображения последних загруженных котировок."""
-    serializer_class = serializers.DailyPricesSerializer
+    serializer_class = serializers.RatesSerializer
     filter_backends = (OrderingFilter,)
     ordering_fields = ['value']
 
@@ -47,6 +51,7 @@ class RatesView(generics.ListAPIView):
         Используется 2 уровня кеша:
         - кеш для полного списка последних котировок (одинаков для всех пользователей);
         - кеш ответа для каждого пользователя (декоратор);
+        Оба кеша учитывают параметры запроса.
         """
         cache_key = f'{const.rates_cache_key}:{request.get_full_path()}'
         rates = cache.get(key=cache_key)
@@ -85,3 +90,63 @@ class RatesView(generics.ListAPIView):
                 ]
         return rates
 
+
+class AnalyticsView(generics.ListAPIView):
+    """Представление для отображения аналитики по конкретной валюте."""
+    serializer_class = serializers.AnalyticsSerializer
+    filter_backends = (DjangoFilterBackend,)
+    filterset_class = DateRangeFilter
+
+    def get_queryset(self) -> QuerySet:
+        """
+        Фильтрует qs с ценами по id валюты, а также
+        обогащает его данными для аналитики.
+        """
+        currency_id = self.kwargs.get('id')
+        qs = CurrencyPrice.objects.filter(
+           currency_id=currency_id
+        )
+        qs = self._add_analytics(qs)
+
+        return qs
+
+    def _add_analytics(self, queryset: QuerySet) -> QuerySet:
+        """Добавляет аналитические данные в qs."""
+        threshold = self.request.query_params.get('threshold')
+        if threshold:
+            # признак превышения котировкой порогового значения
+            threshold_match_expr = Case(
+                When(value__gt=threshold, then=Value('exceeded')),
+                When(value__lt=threshold, then=Value('less')),
+                default=Value('equal'),
+            )
+            # процентное отношение котировки к пороговому значению;
+            # при вычислении процента учитываем, что в threshold может быть 0
+            # и это может вызвать ошибку деления на 0
+            threshold_percent_expr = (
+                F('value') / Value(threshold) * 100 if float(threshold) > 0
+                else Value(None)
+            )
+
+            queryset = queryset.annotate(
+                threshold_match_type=threshold_match_expr,
+                percentage_ratio=ExpressionWrapper(
+                    threshold_percent_expr,
+                    output_field=DecimalField(max_digits=10, decimal_places=2),
+                )
+            )
+
+        # признак максимальной и минимальной котировки в выборке
+        max_value_expr = Window(
+            expression=Max('value'),
+            partition_by=(F('currency_id'),)
+        )
+        min_value_expr = Window(
+            expression=Min('value'),
+            partition_by=(F('currency_id'),)
+        )
+
+        return queryset.annotate(
+            is_max_value=Q(value=max_value_expr),
+            is_min_value=Q(value=min_value_expr),
+        )
