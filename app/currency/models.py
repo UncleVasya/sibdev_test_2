@@ -39,3 +39,4 @@ class UserCurrency(models.Model):
 
     class Meta:
         ordering = ('currency',)
+        unique_together = ('user', 'currency')

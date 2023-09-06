@@ -33,6 +33,8 @@ INSTALLED_APPS = [
 
     'app.currency',
     'app.users',
+
+    'drf_spectacular',
 ]
 
 MIDDLEWARE = [
@@ -140,7 +142,9 @@ REST_FRAMEWORK = {
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
     'ORDERING_PARAM': 'order_by',
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 }
+
 
 JWT_ACCESS_TOKEN_LIFETIME = env('JWT_ACCESS_TOKEN_LIFETIME', default=5)
 JWT_REFRESH_TOKEN_LIFETIME = env('JWT_REFRESH_TOKEN_LIFETIME', default=360)
@@ -155,6 +159,15 @@ AUTH_USER_MODEL = 'users.User'
 DJOSER = {
     'LOGIN_FIELD': 'email',
 }
+
+
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'Sibdev test task API',
+    'DESCRIPTION': 'Test task for Sibdev company',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+}
+
 
 CBR_DAILY_API_HOST = env(
     'CBR_DAILY_API_HOST',

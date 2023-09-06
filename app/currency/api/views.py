@@ -15,16 +15,30 @@ from app.currency.api.filters import DateRangeFilter
 from app.currency.models import UserCurrency, CurrencyPrice
 from app.tools.helpers import cache_per_user
 from django_filters.rest_framework import DjangoFilterBackend
+from drf_spectacular.utils import extend_schema, OpenApiParameter
+from drf_spectacular.types import OpenApiTypes
 
 
 class UserCurrencyCreateView(generics.CreateAPIView):
-    """Представление для добавления пользователем отслеживаемой валюты."""
+    """API для добавления пользователем отслеживаемой валюты."""
     queryset = UserCurrency.objects.all()
     serializer_class = serializers.UserCurrencySerializer
 
 
+@extend_schema(
+    parameters=[
+        OpenApiParameter(
+            name='order_by',
+            description='Поле для сортировки списка квот',
+            required=False,
+            type=OpenApiTypes.STR,
+            location=OpenApiParameter.QUERY,
+            enum=['value', '-value'],
+        ),
+    ]
+)
 class RatesView(generics.ListAPIView):
-    """Представление для отображения последних загруженных котировок."""
+    """API для отображения последних загруженных котировок."""
     serializer_class = serializers.RatesSerializer
     filter_backends = (OrderingFilter,)
     ordering_fields = ['value']
@@ -91,8 +105,40 @@ class RatesView(generics.ListAPIView):
         return rates
 
 
+@extend_schema(
+    parameters=[
+        OpenApiParameter(
+            name='threshold',
+            description='Пороговое значение цены',
+            required=False,
+            type=OpenApiTypes.NUMBER,
+            location=OpenApiParameter.QUERY,
+        ),
+        OpenApiParameter(
+            name='date_from',
+            description='Начальная дата выборки',
+            required=False,
+            type=OpenApiTypes.DATE,
+            location=OpenApiParameter.QUERY,
+        ),
+        OpenApiParameter(
+            name='date_to',
+            description='Конечная дата выборки',
+            required=False,
+            type=OpenApiTypes.DATE,
+            location=OpenApiParameter.QUERY,
+        ),
+        OpenApiParameter(
+            name='id',
+            description='id валюты',
+            required=True,
+            type=OpenApiTypes.INT,
+            location=OpenApiParameter.PATH,
+        ),
+    ]
+)
 class AnalyticsView(generics.ListAPIView):
-    """Представление для отображения аналитики по конкретной валюте."""
+    """API для отображения аналитики по конкретной валюте."""
     serializer_class = serializers.AnalyticsSerializer
     filter_backends = (DjangoFilterBackend,)
     filterset_class = DateRangeFilter
