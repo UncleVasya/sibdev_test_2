@@ -36,6 +36,7 @@ class AnalyticsSerializer(serializers.ModelSerializer):
     date = serializers.DateField()
     charcode = serializers.CharField(source='currency.char_code')
     value = serializers.FloatField()
+
     threshold_match_type = serializers.CharField(default='no threshold')
     percentage_ratio = serializers.DecimalField(decimal_places=2, max_digits=10, default=None)
     is_max_value = serializers.BooleanField()

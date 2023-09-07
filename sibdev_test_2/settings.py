@@ -30,6 +30,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'django_filters',
     'djoser',
+    'post_office',
+    'solo',
 
     'app.currency',
     'app.users',
@@ -186,5 +188,23 @@ CELERY_BEAT_SCHEDULE = {
         'task': 'currency.load_daily_prices',
         'schedule': crontab(minute='0', hour='12'),
     },
+}
+
+
+DEFAULT_FROM_EMAIL = env('DEFAULT_FROM_EMAIL', default='developer@localhost')
+SERVER_EMAIL = env('SERVER_EMAIL', default='root@localhost')
+EMAIL_BACKEND = env(
+    'EMAIL_BACKEND',
+    default='django.core.mail.backends.console.EmailBackend',
+)
+EMAIL_HOST = env('EMAIL_HOST', default='localhost')
+EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD', default='')
+EMAIL_HOST_USER = env('EMAIL_HOST_USER', default='')
+EMAIL_PORT = env.int('EMAIL_PORT', default=25)
+EMAIL_USE_TLS = env.bool('EMAIL_USE_TLS', default=False)
+EMAIL_USE_SSL = env.bool('EMAIL_USE_SSL', default=False)
+
+POST_OFFICE = {
+    'DEFAULT_PRIORITY': 'now',
 }
 

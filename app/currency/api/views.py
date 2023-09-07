@@ -8,6 +8,7 @@ from django.http import HttpRequest
 from django.utils.decorators import method_decorator
 from rest_framework import generics
 from rest_framework.filters import OrderingFilter
+from rest_framework import permissions
 from rest_framework.response import Response
 import typing as t
 from app.currency.api import serializers, const
@@ -70,12 +71,10 @@ class RatesView(generics.ListAPIView):
         cache_key = f'{const.rates_cache_key}:{request.get_full_path()}'
         rates = cache.get(key=cache_key)
         if rates is None:
-            print(f'writing {cache_key}')
+            # в кеше пусто, заполняем кеш
             qs = self.filter_queryset(self.get_queryset())
             rates = list(qs)
             cache.set(key=cache_key, value=rates)
-        else:
-            print(f'reading {cache_key}')
 
         rates = self._filter_by_user(rates, self.request.user)
 
@@ -142,6 +141,7 @@ class AnalyticsView(generics.ListAPIView):
     serializer_class = serializers.AnalyticsSerializer
     filter_backends = (DjangoFilterBackend,)
     filterset_class = DateRangeFilter
+    permission_classes = (permissions.IsAuthenticated,)
 
     def get_queryset(self) -> QuerySet:
         """

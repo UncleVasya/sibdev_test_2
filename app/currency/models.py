@@ -1,6 +1,9 @@
+import datetime
+
 from django.db import models
 
 from app.users.models import User
+from solo.models import SingletonModel
 
 
 class Currency(models.Model):
@@ -16,7 +19,11 @@ class Currency(models.Model):
 
 class CurrencyPrice(models.Model):
     date = models.DateField()
-    currency = models.ForeignKey(Currency, on_delete=models.CASCADE)
+    currency = models.ForeignKey(
+        Currency,
+        on_delete=models.CASCADE,
+        related_name='prices',
+    )
     value = models.DecimalField(decimal_places=4, max_digits=10)
 
     class Meta:
@@ -40,3 +47,9 @@ class UserCurrency(models.Model):
     class Meta:
         ordering = ('currency',)
         unique_together = ('user', 'currency')
+
+
+class CommonData(SingletonModel):
+    price_email_latest_date = models.DateField(
+        default=datetime.date.fromisoformat('2000-01-01')
+    )

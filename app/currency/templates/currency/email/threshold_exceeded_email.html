@@ -1,0 +1,26 @@
+{% spaceless %}
+
+<table style="text-align:left">
+<thead style="color:blue">
+    <tr>
+        <th> Валюта </th>
+        <th> Код </th>
+        <th> Пороговое значение </th>
+        <th> Текущая стоимость </th>
+    </tr>
+</thead>
+
+<tbody>
+    {% for obj in prices %}
+    <tr>
+        <td> {{ obj.currency.name }} </td>
+        <td> {{ obj.currency.char_code }} </td>
+        <td> {{ obj.threshold }} </td>
+        <td> {{ obj.value }} </td>
+    </tr>
+    {% endfor %}
+</tbody>
+</table>
+
+
+{% endspaceless %}

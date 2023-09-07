@@ -23,7 +23,7 @@ class CbrDailyApiClient:
     currencies: t.Dict[str, dict] = dict()
 
     def load_price_history(
-        self, days: int = 30, progress_callback=None
+        self, days: int = 30, progress_callback: t.Callable = None
     ) -> None:
         """
         Загружает котировки для всех валют за указанное количество дней.
