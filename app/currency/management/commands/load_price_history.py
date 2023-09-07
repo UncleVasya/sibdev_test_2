@@ -1,13 +1,12 @@
+import datetime
+import logging
+
 from django.core.management.base import BaseCommand
 from tqdm import tqdm
 
 from app.currency.cbr_client import CbrDailyApiClient
-import datetime
-import logging
-
 from app.currency.helpers import clear_api_cache
 from app.currency.tasks import send_threshold_emails
-
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)

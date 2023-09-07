@@ -1,23 +1,22 @@
+import typing as t
+
 from django.contrib.auth.models import AbstractUser, AnonymousUser
 from django.core.cache import cache
-from django.db.models import (
-    QuerySet, Subquery, Window, Max, F, Value, Case,
-    When, ExpressionWrapper, Q, Min, DecimalField
-)
+from django.db.models import (Case, DecimalField, ExpressionWrapper, F, Max,
+                              Min, Q, QuerySet, Subquery, Value, When, Window)
 from django.http import HttpRequest
 from django.utils.decorators import method_decorator
-from rest_framework import generics
-from rest_framework.filters import OrderingFilter
-from rest_framework import permissions
-from rest_framework.response import Response
-import typing as t
-from app.currency.api import serializers, const
-from app.currency.api.filters import DateRangeFilter
-from app.currency.models import UserCurrency, CurrencyPrice
-from app.tools.helpers import cache_per_user
 from django_filters.rest_framework import DjangoFilterBackend
-from drf_spectacular.utils import extend_schema, OpenApiParameter
 from drf_spectacular.types import OpenApiTypes
+from drf_spectacular.utils import OpenApiParameter, extend_schema
+from rest_framework import generics, permissions
+from rest_framework.filters import OrderingFilter
+from rest_framework.response import Response
+
+from app.currency.api import const, serializers
+from app.currency.api.filters import DateRangeFilter
+from app.currency.models import CurrencyPrice, UserCurrency
+from app.tools.helpers import cache_per_user
 
 
 class UserCurrencyCreateView(generics.CreateAPIView):

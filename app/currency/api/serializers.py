@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from app.currency.models import UserCurrency, Currency
+from app.currency.models import Currency, UserCurrency
 
 
 class UserCurrencySerializer(serializers.ModelSerializer):

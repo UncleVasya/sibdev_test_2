@@ -1,13 +1,13 @@
 import time
+import typing as t
+from datetime import date, datetime, timedelta
+from logging import getLogger
 from urllib.parse import urljoin
 
 import requests
 from django.conf import settings
 
 from app.currency.models import Currency, CurrencyPrice
-import typing as t
-from logging import getLogger
-from datetime import date, datetime, timedelta
 
 logger = getLogger(__name__)
 

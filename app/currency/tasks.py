@@ -1,15 +1,15 @@
 import datetime
+from itertools import groupby
 
 from django.conf import settings
-from django.db.models import Max, Q, F
+from django.db.models import F, Max, Q
 from django.template.loader import render_to_string
+from post_office import mail
 
+from app.currency.cbr_client import CbrDailyApiClient
 from app.currency.helpers import clear_api_cache
 from app.currency.models import CommonData, UserCurrency
 from sibdev_test_2.celery import app
-from post_office import mail
-from itertools import groupby
-from app.currency.cbr_client import CbrDailyApiClient
 
 
 @app.task(name='currency.load_daily_prices')

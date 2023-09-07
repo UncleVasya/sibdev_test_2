@@ -1,8 +1,8 @@
-from django.core.management.base import BaseCommand
-from app.users.models import User
-
 from logging import getLogger
 
+from django.core.management.base import BaseCommand
+
+from app.users.models import User
 
 logger = getLogger(__name__)
 
