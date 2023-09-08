@@ -1,15 +1,17 @@
 import datetime
-from decimal import Decimal
 import typing as t
+from decimal import Decimal
+
 from django.core.cache import cache
-from django.db.models import Min, Max
+from django.db.models import Max, Min
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
 
-from app.currency.models import UserCurrency, CurrencyPrice, Currency
+from app.currency.models import Currency, CurrencyPrice, UserCurrency
 from app.currency.tests.factories import UserCurrencyFactory
-from app.currency.tests.mixins import CurrenciesSetupMixin, CurrencyPricesSetupMixin
+from app.currency.tests.mixins import (CurrenciesSetupMixin,
+                                       CurrencyPricesSetupMixin)
 from app.users.models import User
 from app.users.tests.mixins import UsersSetupMixin
 
@@ -21,13 +23,13 @@ class UserCurrencyCreateViewTestCase(UsersSetupMixin,
 
     url = reverse('currency:user-currency')
 
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
 
         UserCurrency.objects.all().delete()
         self.client.force_authenticate(self.user)
 
-    def test_authentication_required(self):
+    def test_authentication_required(self) -> None:
         data = {
             'currency': self.currencies[0].id,
             'threshold': 100,
@@ -36,7 +38,7 @@ class UserCurrencyCreateViewTestCase(UsersSetupMixin,
         response = self.client.post(self.url, data=data)
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
-    def test_add_currency_success(self):
+    def test_add_currency_success(self) -> None:
         """Проверяет добавление пользователем отслеживаемой валюты."""
         data = {
             'currency': self.currencies[0].id,
@@ -51,7 +53,7 @@ class UserCurrencyCreateViewTestCase(UsersSetupMixin,
         self.assertEqual(obj.user_id, self.user.id)
         self.assertEqual(obj.threshold, data['threshold'])
 
-    def test_cannot_add_same_currency_twice(self):
+    def test_cannot_add_same_currency_twice(self) -> None:
         """Проверяет, что нельзя повторно добавить уже отслеживаемую валюту."""
         data = {
             'currency': self.currencies[0].id,
@@ -88,13 +90,13 @@ class RatesViewTestCase(UsersSetupMixin,
                 currency=currency,
             )
 
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
         self.client.force_authenticate(self.user)
 
         cache.clear()
 
-    def test_user_with_tracked_currencies(self):
+    def test_user_with_tracked_currencies(self) -> None:
         """
         Проверяет получение дневных котировок пользователем,
         у которого есть валюты в списке отслеживаемых.
@@ -114,7 +116,7 @@ class RatesViewTestCase(UsersSetupMixin,
 
         self.assert_prices_response(data, expected_prices)
 
-    def test_user_without_tracked_currencies(self):
+    def test_user_without_tracked_currencies(self) -> None:
         """
         Если у пользователя пустой список отслеживаемых валют,
         api возвращает данные по всем валютам.
@@ -138,7 +140,7 @@ class RatesViewTestCase(UsersSetupMixin,
 
         self.assert_prices_response(data, expected_prices)
 
-    def test_anonymous_user(self):
+    def test_anonymous_user(self) -> None:
         """
         Для неавторизованного пользователя api возвращает данные
         по всем валютам.
@@ -158,7 +160,7 @@ class RatesViewTestCase(UsersSetupMixin,
 
         self.assert_prices_response(data, expected_prices)
 
-    def test_order_by_value(self):
+    def test_order_by_value(self) -> None:
         """
         Проверяет возможность сортировки ответа api по стоимости валют.
         """
@@ -186,7 +188,7 @@ class RatesViewTestCase(UsersSetupMixin,
             self,
             response_data: t.List[t.Dict],
             prices: t.List[CurrencyPrice],
-    ):
+    ) -> None:
         """
         Проверяет, что полученные в ответе api котировки соответствуют
         ожидаемым.

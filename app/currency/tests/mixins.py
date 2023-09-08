@@ -1,10 +1,10 @@
 import datetime
+import typing as t
 
 from faker import Faker
 
 from app.currency.models import Currency, CurrencyPrice
 from app.currency.tests.factories import CurrencyFactory, CurrencyPriceFactory
-import typing as t
 
 fake = Faker(locale='ru')
 

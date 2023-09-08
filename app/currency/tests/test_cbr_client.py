@@ -1,17 +1,16 @@
 import datetime
-import importlib
 import json
 import re
-
-from django.conf import settings
-from faker import Faker
-from django.test import TestCase
 import typing as t
-import responses
 
-from app.currency.tests.helpers import fake_decimal
+import responses
+from django.conf import settings
+from django.test import TestCase
+from faker import Faker
+
 from app.currency.cbr_client import CbrDailyApiClient
 from app.currency.models import Currency, CurrencyPrice
+from app.currency.tests.helpers import fake_decimal
 
 fake = Faker(locale='ru')
 
@@ -40,7 +39,7 @@ class CbrApiClientTestCase(TestCase):
             d = today - datetime.timedelta(days=i)
             cls.prices_history[d] = cls._gen_api_currency_prices()
 
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
         Currency.objects.all().delete()
         CurrencyPrice.objects.all().delete()
@@ -50,7 +49,7 @@ class CbrApiClientTestCase(TestCase):
         """Проверяет загрузку истории цен."""
 
         # мок ответа от api
-        def request_callback(request):
+        def request_callback(request) -> t.Tuple[int, t.Dict, str]:
             year, month, day = map(int, request.path_url.split('/')[2:5])
             date = datetime.date(year, month, day)
             data = self._api_prices_response(date)
