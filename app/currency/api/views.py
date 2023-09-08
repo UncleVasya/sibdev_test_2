@@ -23,6 +23,7 @@ class UserCurrencyCreateView(generics.CreateAPIView):
     """API для добавления пользователем отслеживаемой валюты."""
     queryset = UserCurrency.objects.all()
     serializer_class = serializers.UserCurrencySerializer
+    permission_classes = (permissions.IsAuthenticated,)
 
 
 @extend_schema(

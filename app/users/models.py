@@ -6,7 +6,7 @@ from django.utils.translation import gettext_lazy as _
 
 
 class UserManager(DjangoUserManager):
-    """ Менеджер объектов, который работает без имени пользователя. """
+    """Менеджер объектов, который работает без имени пользователя."""
     def _create_user(self, email, password, **extra_fields):
         email = self.normalize_email(email)
         user = User(email=email, **extra_fields)
@@ -29,7 +29,7 @@ class UserManager(DjangoUserManager):
 
 
 class User(auth.AbstractUser):
-    """ Наша кастомная модель пользователя. """
+    """Наша кастомная модель пользователя."""
     username = None
     email = models.EmailField(_('Email address'), unique=True)
 
