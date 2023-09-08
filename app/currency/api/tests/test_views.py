@@ -30,6 +30,7 @@ class UserCurrencyCreateViewTestCase(UsersSetupMixin,
         self.client.force_authenticate(self.user)
 
     def test_authentication_required(self) -> None:
+        """Проверяет необходимость авторизации для доступа к эндпоинту"
         data = {
             'currency': self.currencies[0].id,
             'threshold': 100,
@@ -208,7 +209,6 @@ class AnalyticsViewTestCase(UsersSetupMixin,
 
     user: User
     currency: Currency
-    # user_currency: UserCurrency
     price_history_days: int
 
 
@@ -223,17 +223,12 @@ class AnalyticsViewTestCase(UsersSetupMixin,
             kwargs={'id': cls.currency.id}
         )
 
-        # cls.user_currency = UserCurrencyFactory(
-        #     user=cls.user,
-        #     currency=currency,
-        #     threshold=threshold,
-        # )
-
     def setUp(self) -> None:
         super().setUp()
         self.client.force_authenticate(self.user)
 
     def test_authentication_required(self) -> None:
+        """Проверяет необходимость авторизации для доступа к эндпоинту"
         self.client.logout()
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
