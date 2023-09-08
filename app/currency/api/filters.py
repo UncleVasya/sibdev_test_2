@@ -2,6 +2,7 @@ from django_filters import rest_framework
 
 
 class DateRangeFilter(rest_framework.FilterSet):
+    """Фильтр по интервалу дат"""
     date_from = rest_framework.DateFilter(
         field_name='date',
         lookup_expr='gte',
