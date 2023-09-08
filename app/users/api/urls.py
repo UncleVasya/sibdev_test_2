@@ -7,9 +7,6 @@ app_name = 'users'
 
 
 urlpatterns = [
-    # path('', include('djoser.urls')),
-    # path('', include('djoser.urls.jwt')),
-
     path(
         'register/',
         UserViewSet.as_view({'post': 'create'}),
