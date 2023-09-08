@@ -12,6 +12,7 @@ from app.currency import models
 
 
 class CurrencyFactory(factory.django.DjangoModelFactory):
+    """Фабрика для модели валют"""
     class Meta:
         model = models.Currency
 
@@ -22,13 +23,14 @@ class CurrencyFactory(factory.django.DjangoModelFactory):
     name = factory.LazyAttribute(lambda x: x.currency[1])
 
     @classmethod
-    def _create(cls, model_class, *args, **kwargs):
+    def _create(cls, model_class, *args, **kwargs) -> models.Currency:
         # убираем служебное поле currency
         kwargs.pop('currency', None)
         return super()._create(model_class, *args, **kwargs)
 
 
 class CurrencyPriceFactory(factory.django.DjangoModelFactory):
+    """Фабрика для модели стоимости валют"""
     class Meta:
         model = models.CurrencyPrice
 
@@ -38,6 +40,7 @@ class CurrencyPriceFactory(factory.django.DjangoModelFactory):
 
 
 class UserCurrencyFactory(factory.django.DjangoModelFactory):
+    """Фабрика для модели отслеживания валюты пользователем"""
     class Meta:
         model = models.UserCurrency
 

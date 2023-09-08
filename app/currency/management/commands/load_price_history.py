@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 class Command(BaseCommand):
     help = 'Загружает историю цен всех котируемых валют.'
 
-    def add_arguments(self, parser):
+    def add_arguments(self, parser) -> None:
         parser.add_argument(
             '-d', '--days', nargs='?', type=int, default=30,
             help='Количество дней, для которых загрузить котировки.'
@@ -27,7 +27,7 @@ class Command(BaseCommand):
                  'сегодня уже отправлялись.'
         )
 
-    def handle(self, *args, **options):
+    def handle(self, *args, **options) -> None:
         days = options['days']
         errors = 0
 
